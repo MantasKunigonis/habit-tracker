@@ -7,4 +7,4 @@ Need a simple embedded database for prototyping.
 Use SQLite for the database.
 
 ## Tradeoffs
-Not suitable for scaling.
+Lightweight, but not suitable for scaling.
