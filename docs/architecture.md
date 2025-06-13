@@ -47,6 +47,6 @@ Help users build consistent habits through tracking and feedback.
 ### Component Diagram
 Frontend: pages -> Backend: Flask API (RESTX), Authorization (Flask-Login), Database layer (SQLAlchemy models), Config (python-dotenv) -> Database: SQLite (tables: users and habits) -> CI/CD: GitHub Actions (lint and test), Docker (deploy)
 
-## Deployment Overview:
+## Deployment Overview
 - Docker Compose and .env for config for local development.
 - Docker image and GitHub Actions for production.
