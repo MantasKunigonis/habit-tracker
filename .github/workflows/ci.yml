@@ -64,12 +64,12 @@ jobs:
 
       - name: Lint backend
         working-directory: ./backend
-        run: .venv\Scripts\flake8 .
+        run: python -m flake8 .
 
       - name: Format backend (check)
         working-directory: ./backend
-        run: .venv\Scripts\black --check .
+        run: python -m black --check .
 
       - name: Test backend
         working-directory: ./backend
-        run: .venv\Scripts\pytest
+        run: python -m pytest
