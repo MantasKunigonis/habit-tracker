@@ -67,7 +67,7 @@ jobs:
         run: |
           source .venv/bin/activate
           pip install flake8
-          source .venv/bin/activate
+          .venv/Scripts/flake8 --config=pyproject.toml .
           flake8 .
 
       - name: Format backend (check)
