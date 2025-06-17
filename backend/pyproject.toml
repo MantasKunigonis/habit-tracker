@@ -3,7 +3,3 @@ line-length = 88
 
 [tool.isort]
 profile = "black"
-
-[tool.flake8]
-exclude = [".venv", "__pycache__", ".git"]
-max-line-length = 88
