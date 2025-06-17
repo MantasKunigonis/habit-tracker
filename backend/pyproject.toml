@@ -5,9 +5,5 @@ line-length = 88
 profile = "black"
 
 [tool.flake8]
+exclude = [".venv", "__pycache__", ".git"]
 max-line-length = 88
-exclude =
-  "venv",
-  ".venv",
-  "__pycache__",
-  ".git"
