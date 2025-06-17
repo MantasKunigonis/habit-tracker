@@ -50,7 +50,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
       - name: Create Python venv
         working-directory: ./backend
@@ -64,7 +64,11 @@ jobs:
 
       - name: Lint backend
         working-directory: ./backend
-        run: python -m flake8 .
+        run: |
+          source .venv/bin/activate
+          pip install flake8
+          source .venv/bin/activate
+          flake8 .
 
       - name: Format backend (check)
         working-directory: ./backend
