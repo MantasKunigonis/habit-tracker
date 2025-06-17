@@ -64,11 +64,7 @@ jobs:
 
       - name: Lint backend
         working-directory: ./backend
-        run: |
-          source .venv/bin/activate
-          pip install flake8
-          .venv/bin/flake8 --config=pyproject.toml .
-          flake8 .
+        run: .venv/bin/flake8 --config=pyproject.toml .
 
       - name: Format backend (check)
         working-directory: ./backend
