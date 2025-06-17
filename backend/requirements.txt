@@ -1,0 +1,9 @@
+Flask
+python-dotenv
+Flask-Login
+Flask-RESTX
+SQLAlchemy
+pytest
+Flask-Testing
+flake8
+black
