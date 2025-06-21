@@ -17,19 +17,6 @@ Help users build consistent habits through tracking and feedback.
 - UI is mobile friendly.
 - App is deployed via Docker container with GitHub CI/CD.
 
-## Tech Stack
-- Backend: Flask (Python)
-- Environment Management: python-dotenv + .env file
-- Database: SQLite
-- ORM: SQLAlchemy
-- Auth: Flask-Login
-- API Docs: Flask-RESTX
-- Frontend: Next.js (React (JS))
-- Styling: Bootstrap (CSS)
-- Testing: pytest + Flask-Testing
-- CI/CD: GitHub Actions
-- Deployment: Docker
-
 ## Architecture Layers
 - UI -> API -> Business Logic -> Data Layer
 - UI: Next.js components that the user interacts with.
