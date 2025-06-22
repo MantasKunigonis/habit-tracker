@@ -66,6 +66,9 @@ Track and build better habits with this app.
 - Diagrams and project information are in [docs/architecture.md](docs/architecture.md).
 - Decisions are documented in [docs/adr](docs/adr).
 
+## Project Plan
+Information regarding the project plan is found in [docs/project-plan.txt](docs/project-plan.txt).
+
 ## Security
 - Security guidelines are in [SECURITY.md](SECURITY.md).
 - Private vulnerability reporting is enabled via GitHub.
