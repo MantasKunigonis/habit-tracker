@@ -1,0 +1,419 @@
+1. Vision & Requirements
+- Define purpose:
+	Help users build consistent habits through tracking and feedback.
+- Define user personas:
+	A "Solo Habit Tracker" who wants to track habits like meditation, reading, or workouts.
+	An "Accountability Seeker" who wants reminders and to visualize progress.
+	A "Goal-Oriented Pro" who tracks performance and reviews past data.
+- Identify use cases:
+	Register/login/logout user.
+	Create/edit/delete habits.
+	Mark completion of habits.
+	View progress for habits.
+	Set reminders.
+- Identify success:
+	User can create and track habits.
+	App is user friendly.
+	UI is mobile friendly.
+	App is deployed via Docker container with GitHub CI/CD.
+
+2. Version Control (Tools: Git, GitHub)
+- Create GitHub repository:
+	GitHub.com/MantasKunigonis/habit-tracker
+- Enable GitHub Issues:
+	Enabled.
+- Enable GitHub Projects:
+	Enabled.
+- Enable GitHub Wiki:
+	Enabled.
+- Define GitHub Issue labels.
+	Defined as backend, deployment, documentation, and frontend.
+- Create GitHub Issue milestones.
+	Created as MVP and v1.0.
+- Draw initial set of Issues with labels and milestones for each major task:
+	Created as shown below.
+		Issue: Initialize Flask project
+			Description: Set up basic Flask app structure. Add entry point and basic route.
+			Label: backend
+		Issue: Set up python-dotenv for environment management
+			Description: Create .env file. Load environment variables into Flask app.
+			Label: backend
+		Issue: Configure SQLite database
+			Description: Add SQLite URI to .env. Connect using SQLAlchemy.
+			Label: backend
+		Issue: Set up SQLAlchemy ORM
+			Description: Define base models directory. Create initial User and Habit models.
+			Label: backend
+		Issue: Integrate Flask-Login for authentication
+			Description: Add login manager. Create login/logout routes. Add session support.
+			Label: backend
+		Issue: Add Flask-RESTX for API documentation
+			Description: Create basic RESTX API blueprint. Set up Swagger UI. Document /auth and /habit endpoints.
+			Label: backend
+		Issue: Initialize Next.js frontend project
+			Description: Set up with create-next-app. Configure for development proxy to Flask backend.
+			Label: frontend
+		Issue: Integrate Bootstrap for frontend styling
+			Description: Install Bootstrap via npm. Add layout and UI components using Bootstrap classes.
+			Label: frontend
+		Issue: Set up testing environment
+			Description: Create test config and dummy test case. Add pytest.ini.
+			Label: backend
+		Issue: Set up CI pipeline with GitHub Actions
+			Description: Add .github/workflows/ci.yml. Run lint, test, and build on push.
+			Label: deployment
+		Issue: Dockerize app for deployment
+			Description: Create Dockerfile and docker-compose.yml. Support local dev and production builds.
+			Label: deployment
+- Set up a GitHub Project Kanban Board and organize Issues into columns like backlog (this hasn't been started, to-do (this is ready to be picked up), in-progress (this is being worked on), in review (this is being reviewed), and done (this has been completed).
+	Done.
+
+3. IDE
+- Configure IDE and necessary extensions.
+- Link to GitHub.
+- Clone GitHub repository locally.
+
+4. Architecture Decisions
+- Create /docs/adr/ folder to record each key decision.
+	Created.
+- For each architecture decision created a file and record context, decision, and tradeoffs.
+	Created and recorded.
+
+5. Architecture Diagrams (Tools: draw.io, c4model.com)
+- Create docs/architecture.md for architecture diagrams and notes.
+	Created.
+- Sketch context diagram showing external actors, user interface, services, and data sources.
+	User -> Frontend
+	Frontend -> Backend
+	Backend -> Database
+	GitHub Actions -> Application
+	Docker -> Application
+- Draft component diagram outlining frontend clients, backend services, data stores, and third party integrations.
+	Frontend: pages -> Backend: Flask API (RESTX), Authorization (Flask-Login), Database layer (SQLAlchemy models), Config (python-dotenv) -> Database: SQLite (tables: users and habits) -> CI/CD: GitHub Actions (lint and test), Docker (deploy)
+- Identify major layers and responsibilities like UI -> API -> Business Logic -> Data Layer.
+	UI: Next.js components that the user interacts with.
+	API: Flask-RESTX endpoints.
+	Business Logic: Creation, editing, and tracking of habits.
+	Data Layer: SQLAlchemy models and SQLite.
+- Outline deployment targets.
+	Docker Compose and .env for config for local development.
+	Docker image and GitHub Actions for production.
+
+6. Data Model & API Contracts (Tools: dbdiagram.io, Swagger Editor, Stoplight)
+- Create Entity-Relationship Diagram defining entities, primary keys, foreign keys, major relationships, and essential fields with data types.
+	Table users {
+		id integer [pk, increment]
+		username varchar [unique, not null]
+		email varchar [unique, not null]
+		password_hash varchar
+		created_at datetime
+	}
+	Table habits {
+		id integer [pk, increment]
+		user_id integer [ref: > users.id]
+		name varchar
+		description text
+		frequency varchar
+		created_at datetime
+	}
+	Table checkins {
+		id integer [pk, increment]
+		habit_id integer [ref: > habits.id]
+		date date
+		status varchar
+	}
+- Draft OpenAPI (Swagger) specification or at least outline REST endpoint contracts: method, path, request parameters, response schema, and authentication requirements.
+	openapi: 3.0.3
+	info:
+	  title: Habit Tracker API
+	  description: A REST API for user habit management and daily tracking.
+	  version: 1.0.0
+	servers:
+	  - url: http://localhost:5000/api
+	components:
+	  securitySchemes:
+	    bearerAuth:
+	      type: http
+	      scheme: bearer
+	      bearerFormat: JWT
+	  schemas:
+	    User:
+	      type: object
+	      properties:
+ 	       id: { type: integer }
+	        username: { type: string }
+	        email: { type: string }
+	    Habit:
+ 	     type: object
+ 	     properties:
+ 	       id: { type: integer }
+ 	       name: { type: string }
+	        description: { type: string }
+	        frequency: { type: string }
+	    Checkin:
+	      type: object
+	      properties:
+	        date: { type: string, format: date }
+	        status: { type: string }
+	security:
+	  - bearerAuth: []
+	paths:
+	  /auth/register:
+	    post:
+	      summary: Register new user
+	      requestBody:
+	        required: true
+	        content:
+	          application/json:
+	            schema:
+	              type: object
+	              properties:
+	                username: { type: string }
+	                email: { type: string }
+ 	               password: { type: string }
+ 	     responses:
+ 	       '201':
+ 	         description: User registered
+	  /auth/login:
+	    post:
+	      summary: User login
+	      requestBody:
+	        required: true
+	        content:
+	          application/json:
+	            schema:
+	              type: object
+	              properties:
+	                email: { type: string }
+	                password: { type: string }
+	      responses:
+	        '200':
+	          description: Login successful
+	          content:
+	            application/json:
+	              schema:
+	                type: object
+	                properties:
+	                  access_token: { type: string }
+	  /habits:
+	    get:
+	      summary: Get user's habits
+	      security:
+	        - bearerAuth: []
+	      responses:
+	        '200':
+	          description: List of habits
+	          content:
+	            application/json:
+	              schema:
+	                type: array
+	                items:
+	                  $ref: '#/components/schemas/Habit'
+	    post:
+	      summary: Create a habit
+	      security:
+	        - bearerAuth: []
+	      requestBody:
+	        required: true
+	        content:
+	          application/json:
+	            schema:
+	              $ref: '#/components/schemas/Habit'
+	      responses:
+	        '201':
+	          description: Habit created
+	  /habits/{id}:
+	    put:
+	      summary: Update habit
+	      security:
+	        - bearerAuth: []
+	      parameters:
+	        - in: path
+	          name: id
+	          required: true
+	          schema: { type: integer }
+	      requestBody:
+	        required: true
+	        content:
+	          application/json:
+	            schema:
+	              $ref: '#/components/schemas/Habit'
+	      responses:
+	        '200':
+	          description: Habit updated
+	    delete:
+	      summary: Delete habit
+	      security:
+	        - bearerAuth: []
+	      parameters:
+	        - in: path
+	          name: id
+	          required: true
+	          schema: { type: integer }
+	      responses:
+	        '204':
+ 	         description: Habit deleted
+	  /checkins:
+	    post:
+      summary: Create a habit check-in
+	      security:
+	        - bearerAuth: []
+	      requestBody:
+	        required: true
+	        content:
+	          application/json:
+	            schema:
+	              type: object
+	              properties:
+	                habit_id: { type: integer }
+	                date: { type: string, format: date }
+	                status: { type: string }
+	      responses:
+	        '201':
+	          description: Check-in created
+	  /checkins/{habit_id}:
+	    get:
+	      summary: Get habit check-ins
+	      security:
+	        - bearerAuth: []
+	      parameters:
+	        - in: path
+	          name: habit_id
+	          required: true
+	          schema: { type: integer }
+	      responses:
+	        '200':
+	          description: List of check-ins
+	          content:
+	            application/json:
+	              schema:
+	                type: array
+	                items:
+	                  $ref: '#/components/schemas/Checkin'
+- If using GraphQL, outline the schema (types, queries, mutations).
+	N/A.
+
+7. Authentication & Authorization (Tools: Excalidraw, JWT.io)
+- Choose authentication approach.
+	Flask-Login via email and password.
+- Specify user roles and permissions.
+	User can register/login, create/edit/delete habits, check-in, and view progress.
+- Create sequence diagram.
+User----------->Frontend----------->Backend------------>DB
+ |                   |                  |               |
+ |-- submits form -->|                  |               |
+ |                   |-- POST /login -->|               |
+ |                   |                  |-- query DB -->|
+ |                   |<-- set cookie ---|               |
+ |<---- redirect ----|                  |               |
+
+8. Testing Strategy
+- Create /docs/testing-strategy.md checklist.
+	Created.
+- List test types: unit tests, integration tests, end-to-end tests.
+	Unit tests will test individual functions or classes.
+	Integration tests will test Flask API routes and database.
+	End-to-end tests will test full user flows.
+- Choose testing frameworks.
+	pytest for general testing.
+	Flask-Testing to simplify Flask test setup.
+	SQLite in-memory for database testing.
+- Decide where mocks versus real database connections will live.
+	SQLite in-memory for isolated, fast tests.
+	Mocks for external services like API calls.
+- Create placeholder test files.
+	Created tests/test_auth.py, tests/test_habits.py, and tests/test_api.py.
+
+9. Environment & Secret Management
+- List configuration variables.
+	Development:
+		FLASK_ENV=development
+		SECRET_KEY=secret-key
+		DATABASE_URL=sqlite:///habits.db
+		SESSION_COOKIE_NAME=habit_session
+	Production:	
+		SECRET_KEY from cloud secrets
+		DATABASE_URL from cloud secrets
+		SESSION_COOKIE_NAME=habit_session
+- For development store in .env.
+	Ok.
+- For production store in cloud secret manager.
+	Ok.
+
+10. Project Skeleton
+- Set up repository structure.
+	habit-tracker/
+	├── backend/
+	│   ├── app/
+	│   │   ├── __init__.py
+	│   │   ├── models.py
+	│   │   ├── routes.py
+	│   │   ├── auth.py
+	│   │   └── config.py
+	│   ├── tests/
+	│   │   └── test_api.py
+	│   │   └── test_auth.py
+	│   │   └── test_habits.py
+	│   ├── .env
+	│   ├── .env.example
+	│   └── run.py
+	├── frontend/
+	│   └── (Next.js)
+	├── docs/
+	│   ├── env-vars.md
+	│   ├── architecture.md
+	│   ├── testing-strategy.md
+	│   └── adr/
+	│       └── choose-api-documentation.md
+	│       └── choose-authentication.md
+	│       └── choose-backend.md
+	│       └── choose-cicd.md
+	│       └── choose-database.md
+	│       └── choose-deployment.md
+	│       └── choose-environment-management.md
+	│       └── choose-frontend.md
+	│       └── choose-orm.md
+	│       └── choose-styling.md
+	│       └── choose-testing.md
+	├── .gitignore
+	├── docker-compose.yml
+	├── README.md
+- Create empty files and directories for major areas.
+	Created.
+- Add README.md stub with sections.
+	Added.	
+
+11. Coding Standards
+- Decide on style guides.
+	PEP8 style guide for Python.
+	Airbnb style guide for React.
+- Add linting config files with basic rules.
+	Added.
+- Create pre-commit hook to run linters on commit.
+	Created.
+
+12. CI/CD Pipeline (Tools: GitHub)
+- Draft /.github/workflows/ci.yml with stages: checkout code, install dependencies, run linters, run tests, build artifacts, deploy.
+	Drafted.
+
+13. Security & Compliance
+- List security concerns by feature.
+	Feature: user registration | Concern: weak passwords, email enumeration | Mitigation: enforce strong password policy, generic errors
+	Feature: login/auth | Concern: brute force, session hijacking | Mitigation: rate limiting, secure cookies, token expiration
+	Feature: habit creation/update | Concern: injection | Mitigation: input sanitization/validation
+	Feature: API routes | Concern: unauthorized access | Mitigation: require authentication
+- Decide on HTTPS/SSL enforcement.
+	Use HTTPS for all deployments.
+- Plan input validation and sanitization steps.
+	For frontend, escape any user-generated content and use form validation libraries like Zod or React Hook Form.
+	For backend, validate schemas with Pydantic (FastAPI), always use parameterized queries (never raw SQL strings), and sanitize input where necessary.
+- Document handling of user data/privacy in SECURITY.md.
+	Documented.
+
+14. Nonfunctional Requirements
+- Document performance expectations, scalability notes, and availability goals in /docs/nonfunctional-requirements.md.
+	Documented.
+
+15. Final Documentation
+- Update README.md with project name, description, tech stack summary, prerequisites, info on running linters/tests, and links to relevant files.
+	Updated.
