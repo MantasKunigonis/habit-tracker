@@ -1,7 +1,6 @@
 from flask import Flask
 from config import Config
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
