@@ -8,7 +8,8 @@
     "start": "next start",
     "prepare": "is-ci || husky install",
     "lint": "next lint src/",
-    "format": "prettier --write ."
+    "format": "prettier --write",
+    "test": "echo \"No tests yet\""
   },
   "dependencies": {
     "next": "15.3.3",
