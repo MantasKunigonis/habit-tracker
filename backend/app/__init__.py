@@ -1,18 +1,11 @@
 from flask import Flask
 from config import Config
 from dotenv import load_dotenv
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager
 from .auth import auth
 from app.models import User
+from .extensions import db, migrate, login_manager
 
 load_dotenv()
-
-db = SQLAlchemy()
-migrate = Migrate()
-
-login_manager = LoginManager()
 
 
 def create_app():
