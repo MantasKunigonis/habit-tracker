@@ -1,9 +1,10 @@
 from flask import Flask
 from config import Config
 from dotenv import load_dotenv
-from .auth import auth
+from app.auth import auth
 from app.models import User
-from .extensions import db, migrate, login_manager
+from app.extensions import db, migrate, login_manager
+from backend.app.api.api import api
 
 load_dotenv()
 
@@ -21,6 +22,8 @@ def create_app():
 
     login_manager.init_app(app)
     login_manager.login_view = 'main.login'
+
+    api.init_app(app)
 
     return app
 
