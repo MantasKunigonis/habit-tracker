@@ -44,6 +44,12 @@ class User(db.Model, UserMixin):
         backref='user',
         lazy=True
     )
+    # One-to-many relationship with Checkin
+    checkins = db.relationship(
+        'Checkin',
+        backref='user',
+        lazy=True
+    )
 
 
 class Habit(db.Model):
@@ -101,13 +107,21 @@ class Checkin(db.Model):
         db.ForeignKey('habit.id'),
         nullable=False
     )
-    # Date of the check-in
-    date = db.Column(
-        db.Date,
+    # Foreign key to link to User
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('user.id'),
         nullable=False
     )
     # Status of the check-in (e.g., 'done', 'missed')
     status = db.Column(
         db.String(20),
         nullable=False
+    )
+    # Timestamp of the check-in
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=db.func.current_timestamp(),
+        onupdate=db.func.current_timestamp()
     )
