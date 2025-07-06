@@ -16,13 +16,15 @@ user_model = user_ns.model('User', {
 @user_ns.route('/me')
 class UserResource(Resource):
     @user_ns.marshal_with(user_model)
+    @user_ns.response(200, 'User retrieved successfully')
     @login_required
     def get(self):
         """Get the current user's information."""
-        return current_user
+        return current_user, 200
 
-    @user_ns.expect(user_model)
     @user_ns.marshal_with(user_model)
+    @user_ns.expect(user_model)
+    @user_ns.response(200, 'User updated successfully')
     @login_required
     def put(self):
         """Update the current user's information."""
@@ -30,4 +32,12 @@ class UserResource(Resource):
         current_user.username = data['username']
         current_user.email = data['email']
         db.session.commit()
-        return current_user
+        return current_user, 200
+
+    @login_required
+    @user_ns.response(204, 'User deleted successfully')
+    def delete(self):
+        """Delete the current user's account."""
+        db.session.delete(current_user)
+        db.session.commit()
+        return {'message': 'User deleted successfully'}, 204

@@ -19,17 +19,20 @@ habit_model = habit_ns.model('Habit', {
 
 @habit_ns.route('/')
 class HabitList(Resource):
-    @habit_ns.response(200, 'Success')
-    @marshal_with(habit_model, as_list=True)
+    @marshal_with(habit_model)
+    @habit_ns.response(200, 'Habits retrieved successfully')
     @login_required
     def get(self):
+        """Get all habits for the current user."""
         habits = Habit.query.filter_by(user_id=current_user.id).all()
-        return habits
+        return habits, 200
 
+    @marshal_with(habit_model)
     @habit_ns.expect(habit_model)
-    @habit_ns.response(201, 'Habit created')
+    @habit_ns.response(201, 'Habit created successfully')
     @login_required
     def post(self):
+        """Create a new habit for the current user."""
         data = request.get_json()
         new_habit = Habit(
             user_id=current_user.id,
@@ -38,17 +41,47 @@ class HabitList(Resource):
         )
         db.session.add(new_habit)
         db.session.commit()
-        return new_habit.to_dict(), 201
+        return new_habit, 201
 
 
 @habit_ns.route('/<int:id>')
 @habit_ns.param('id', 'Habit ID')
-@habit_ns.response(404, 'Habit not found')
 class HabitResource(Resource):
     @marshal_with(habit_model)
+    @habit_ns.response(200, 'Habit retrieved successfully')
+    @habit_ns.response(404, 'Habit not found')
     @login_required
     def get(self, id):
+        """Get a specific habit by ID."""
         habit = Habit.query.get(id)
         if habit is None:
             habit_ns.abort(404, f'Habit {id} not found')
-        return habit
+        return habit, 200
+
+    @marshal_with(habit_model)
+    @habit_ns.expect(habit_model)
+    @habit_ns.response(200, 'Habit updated successfully')
+    @habit_ns.response(404, 'Habit not found')
+    @login_required
+    def put(self, id):
+        """Update a specific habit by ID."""
+        data = request.get_json()
+        habit = Habit.query.get(id)
+        if habit is None:
+            habit_ns.abort(404, f'Habit {id} not found')
+        habit.name = data['name']
+        habit.description = data.get('description', habit.description)
+        db.session.commit()
+        return habit, 200
+
+    @habit_ns.response(204, 'Habit deleted successfully')
+    @habit_ns.response(404, 'Habit not found')
+    @login_required
+    def delete(self, id):
+        """Delete a specific habit by ID."""
+        habit = Habit.query.get(id)
+        if habit is None:
+            habit_ns.abort(404, f'Habit {id} not found')
+        db.session.delete(habit)
+        db.session.commit()
+        return {'message': 'Habit deleted successfully'}, 204

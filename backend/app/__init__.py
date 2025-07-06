@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from app.auth import auth
 from app.models import User
 from app.extensions import db, migrate, login_manager
-from backend.app.api.api import api
+from app.api.api import api
 
 load_dotenv()
 

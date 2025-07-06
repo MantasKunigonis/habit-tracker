@@ -23,9 +23,11 @@ login_model = auth_ns.model('Login', {
 @auth_ns.route('/register')
 class Register(Resource):
     @auth_ns.expect(user_model)
-    @auth_ns.response(201, 'User created registered')
+    @auth_ns.doc(description="Register endpoint that creates a new user.")
+    @auth_ns.response(201, 'User registered successfully')
     @auth_ns.response(400, 'User already exists')
     def post(self):
+        """Register a new user."""
         data = request.get_json()
         if User.query.filter_by(username=data['username']).first():
             return {'message': 'Username already exists'}, 400
@@ -38,7 +40,7 @@ class Register(Resource):
         )
         db.session.add(new_user)
         db.session.commit()
-        return {'message': 'User created registered'}, 201
+        return {'message': 'User registered successfully'}, 201
 
 
 @auth_ns.route('/login')
@@ -47,6 +49,7 @@ class Login(Resource):
     @auth_ns.response(200, 'Login successful')
     @auth_ns.response(401, 'Invalid credentials')
     def post(self):
+        """Log in a user."""
         data = request.get_json()
         user = User.query.filter_by(username=data['username']).first()
         if user and check_password_hash(user.password, data['password']):
@@ -60,5 +63,6 @@ class Logout(Resource):
     @login_required
     @auth_ns.response(200, 'Logout successful')
     def post(self):
+        """Log out the current user."""
         logout_user()
         return {'message': 'Logout successful'}, 200
