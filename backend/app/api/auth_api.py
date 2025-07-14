@@ -51,8 +51,10 @@ class Login(Resource):
     def post(self):
         """Log in a user."""
         data = request.get_json()
-        user = User.query.filter_by(username=data['username']).first()
-        if user and check_password_hash(user.password, data['password']):
+        username = data.get('username')
+        password = data.get('password')
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password_hash, password):
             login_user(user)
             return {'message': 'Login successful'}, 200
         return {'message': 'Invalid credentials'}, 401
