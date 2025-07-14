@@ -197,3 +197,6 @@ cython_debug/
 node_modules/
 .next/
 out/
+
+# SQLite database
+.db
