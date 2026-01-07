@@ -1,3 +1,10 @@
-export default function Home() {
-  return <h1>Welcome to Habit Tracker</h1>
+import styles from './page.module.css';
+
+export default function DashboardPage() {
+  return (
+    <div className="container">
+      <h1 className={styles.title}>Dashboard</h1>
+      <p className={styles.description}>Welcome to your dashboard!</p>
+    </div>
+  )
 }
