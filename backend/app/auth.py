@@ -1,13 +1,14 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user, login_required
+from flask import Blueprint, render_template, request, redirect, url_for
+from flask import flash, jsonify
+from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
-from app.extensions import db
+from app.extensions import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
 
-auth = Blueprint('auth', __name__)
+auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 
-@auth.route('/register', methods=['GET', 'POST'])
+@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
@@ -32,7 +33,7 @@ def register():
     return render_template('register.html')
 
 
-@auth.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -47,9 +48,22 @@ def login():
     return render_template('login.html')
 
 
-@auth.route('/logout')
+@auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('main.index'))
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+@auth_bp.route('/me', methods=['GET'])
+@login_required
+def me():
+    return jsonify({
+        'username': current_user.username
+    })
